@@ -93,6 +93,30 @@ namespace TilosAzureMvc.Controllers {
             return Content($"{count} sor törölve.");
         }
 
+        [HttpPost]
+        public ActionResult ConvertOldRowKey() {
+            var msg = new StringBuilder("Átírtam:");
+            var item = getLast()[0];
+            var table = getTable();
+            while (item.RowKey.StartsWith("2019")) {
+                var delete = TableOperation.Delete(item);
+                var newItem = new AcrCallback(item.PartitionKey, getRowKeyFromTimeString(item.RowKey)) {
+                    Data = item.Data,
+                    ETag = item.ETag,
+                    StreamId =item.StreamId,
+                    StreamUrl = item.StreamUrl,
+                    Timestamp = item.Timestamp,
+                };
+                var insert = TableOperation.Insert(newItem);
+                table.Execute(delete);
+                table.Execute(insert);
+                msg.AppendLine($"{item.RowKey} -> {newItem.RowKey}");
+
+                item = getLast()[0];
+            }
+            return Content(msg.ToString());
+        }
+
         /// <summary>
         /// Az utolsó x bejegyzést adja vissza
         /// </summary>
@@ -111,9 +135,9 @@ namespace TilosAzureMvc.Controllers {
             }
         }
 
-        [AllowCrossSite(origin ="http://localhost:3000")]
+        [AllowCrossSite(origin = "http://localhost:3000")]
         public ActionResult LastDev(string streamId = TILOSHU_STREAMID, int limit = 1, int offset = 0) {
-            if (limit ==1 && offset == 0) return Json(getLast(streamId, limit, offset)[0].Data, JsonRequestBehavior.AllowGet);
+            if (limit == 1 && offset == 0) return Json(getLast(streamId, limit, offset)[0].Data, JsonRequestBehavior.AllowGet);
             return Json(getLast(streamId, limit, offset), JsonRequestBehavior.AllowGet);
         }
 
@@ -156,7 +180,7 @@ namespace TilosAzureMvc.Controllers {
                 }
             } while (token != null);
 
-            return View(getLast(TILOSHU_STREAMID,1000,0));
+            return View(getLast(TILOSHU_STREAMID, 1000, 0));
         }
 
 
@@ -176,7 +200,7 @@ namespace TilosAzureMvc.Controllers {
                 Where(TableQuery.CombineFilters(
                     TableQuery.CombineFilters(queryPartition, TableOperators.And, queryFrom), TableOperators.And, queryTo));
 
-            return Json(getList(From, To, streamId),JsonRequestBehavior.AllowGet);
+            return Json(getList(From, To, streamId), JsonRequestBehavior.AllowGet);
         }
 
         private List<AcrCallback> getList(string From, string To, string streamId = TILOSHU_STREAMID) {
