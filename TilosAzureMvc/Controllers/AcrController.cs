@@ -126,8 +126,8 @@ namespace TilosAzureMvc.Controllers {
         /// <returns>Az utolsó x bejegyzés tömbje</returns>
         [AllowCrossSite]
         public ActionResult Last(string streamId = TILOSHU_STREAMID, int limit = 1, int offset = 0) {
-            if (limit < 2 && streamId == TILOSHU_STREAMID) {
-                if (_lastCallback == null) return Content("empty");
+            if (limit < 2 && streamId == TILOSHU_STREAMID && _lastCallback != null) {
+                // visszaadjuk a cache-t
                 return Content(_lastCallback.Data);
             } else {
 
