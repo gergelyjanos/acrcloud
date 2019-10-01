@@ -11,6 +11,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Table;
 using System.Net;
+using System.Diagnostics;
 
 namespace TilosAzureMvc.Controllers {
     public class AcrController : Controller {
@@ -65,6 +66,7 @@ namespace TilosAzureMvc.Controllers {
             CloudTable table = getTable();
             ViewBag.Success = table.CreateIfNotExists();
             ViewBag.TableName = table.Name;
+
             return View();
         }
 
@@ -126,6 +128,10 @@ namespace TilosAzureMvc.Controllers {
         /// <returns>Az utolsó x bejegyzés tömbje</returns>
         [AllowCrossSite]
         public ActionResult Last(string streamId = TILOSHU_STREAMID, int limit = 1, int offset = 0) {
+            Trace.WriteLine("Egy sor");
+            Trace.WriteLine("Egy sor kategóriával", "catt1");
+            Trace.TraceError("Hiba trace");
+
             if (limit < 2 && streamId == TILOSHU_STREAMID && _lastCallback != null) {
                 // visszaadjuk a cache-t
                 return Content(_lastCallback.Data);
