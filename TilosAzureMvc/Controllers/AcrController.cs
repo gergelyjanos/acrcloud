@@ -20,7 +20,7 @@ namespace TilosAzureMvc.Controllers {
 
         private static CloudStorageAccount getStorageAccount() {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
-                CloudConfigurationManager.GetSetting("sosandris_AzureStorageConnectionString"));
+                CloudConfigurationManager.GetSetting("acrCloudAzureConnectionString"));
             return storageAccount;
         }
         private static CloudTable getTable() {
