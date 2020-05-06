@@ -12,6 +12,11 @@ namespace TilosAcrCloudWebCore.Manager
 {
     public class TableStorageManager
     {
+        //private const string STORAGE_ACCOUNT_NAME = "devstoreaccount1";
+        //private const string STORAGE_ACCOUNT_KEY = "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==";
+
+        private const string TILOSHU_STREAMID = "s-M1xLrD2";
+
         public async Task<List<AcrCallback>> GetLast(string streamId, int limit = 1, int offset = 0)
         {
             CloudTable table = GetTable();
@@ -39,13 +44,21 @@ namespace TilosAcrCloudWebCore.Manager
             CloudStorageAccount storageAccount = GetStorageAccount();
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
             CloudTable table = tableClient.GetTableReference("AcrData");
+            table.CreateIfNotExistsAsync();
             return table;
         }
 
         private static CloudStorageAccount GetStorageAccount()
         {
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
-                CloudConfigurationManager.GetSetting("acrCloudAzureConnectionString"));
+            CloudStorageAccount storageAccount = 
+                CloudStorageAccount.Parse("UseDevelopmentStorage=true;");
+            
+            //CloudStorageAccount storageAccount = new CloudStorageAccount(
+            //    new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(
+            //        STORAGE_ACCOUNT_NAME,
+            //        STORAGE_ACCOUNT_KEY),
+            //    true);
+
             return storageAccount;
         }
 
@@ -75,12 +88,9 @@ namespace TilosAcrCloudWebCore.Manager
             return retVal.ToString();
         }
 
-        private string GetPartitionFilter(string streamId = "s-M1xLrD2")
+        private string GetPartitionFilter(string streamId = TILOSHU_STREAMID)
         {
             return TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, streamId);
         }
-
-
-
     }
 }

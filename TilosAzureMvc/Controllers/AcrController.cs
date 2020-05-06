@@ -136,7 +136,7 @@ namespace TilosAzureMvc.Controllers {
                 // visszaadjuk a cache-t
                 return Content(_lastCallback.Data);
             } else {
-
+`
                 return Json(getLast(streamId, limit, offset), JsonRequestBehavior.AllowGet);
             }
         }
